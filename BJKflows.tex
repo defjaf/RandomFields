@@ -1,0 +1,112 @@
+%
+%  untitled
+%
+%  Created by Andrew H. Jaffe on 2010-11-30.
+%  Copyright (c) 2010 Imperial College London. All rights reserved.
+%
+\documentclass[]{article}
+
+% Use utf-8 encoding for foreign characters
+\usepackage[utf8]{inputenc}
+
+% Setup for fullpage use
+\usepackage{fullpage}
+
+% Uncomment some of the following if you use the features
+%
+% Running Headers and footers
+%\usepackage{fancyhdr}
+
+% Multipart figures
+%\usepackage{subfigure}
+
+% More symbols
+%\usepackage{amsmath}
+%\usepackage{amssymb}
+%\usepackage{latexsym}
+
+% Surround parts of graphics with box
+\usepackage{boxedminipage}
+
+% Package for including code in the document
+\usepackage{listings}
+
+% If you want to generate a toc for each chapter (use with book)
+\usepackage{minitoc}
+
+% This is now the recommended way for checking for PDFLaTeX:
+\usepackage{ifpdf}
+
+%\newif\ifpdf
+%\ifx\pdfoutput\undefined
+%\pdffalse % we are not running PDFLaTeX
+%\else
+%\pdfoutput=1 % we are running PDFLaTeX
+%\pdftrue
+%\fi
+
+\ifpdf
+\usepackage[pdftex]{graphicx}
+\else
+\usepackage{graphicx}
+\fi
+\title{Using BJK for flows}
+\author{  }
+
+\date{2010-11-30}
+
+\begin{document}
+
+\ifpdf
+\DeclareGraphicsExtensions{.pdf, .jpg, .tif}
+\else
+\DeclareGraphicsExtensions{.eps, .jpg}
+\fi
+
+\maketitle
+
+% 
+% \begin{abstract}
+% \end{abstract}
+% 
+% \section{Introduction}
+
+   OK, I would use the method to do something similar to what you did in the last paper to calculate $P(k)$ in bands. If you have the code to do the correlation matrix, that's basically all you need.  If $s_i$ are the LOS velocities, we want to write
+\begin{equation}
+    C_{ij}[P(k)] = \left<s_i s_j\right> = \sum_b  P_b S_{ij,b} + N_{ij}
+\end{equation}
+where $P(k)$ is top-hat in band b (or any other shape you want) with bandpower $P_b$, so the $S_{ij,b}$ are the partial derivatives with respect to the $P_b$. $N_{ij} = \sigma^2_i \delta_{ij}$ is the noise covariance
+
+For this case, the partials are given by the expressions from the code and paper:
+\begin{equation}
+    \left<s_i s_j\right> = \int \frac{4\pi k^2\;dk}{(2\pi)^3} P_v(k)f_{ij}(k)
+\end{equation}
+with
+\begin{equation}
+    f_{ij}(k) = 
+    \frac{(r_i - \mu_{ij} r_j)(r_j-\mu_{ij} r_i)}{r_i^2 + r_j^2-2\mu_{ij} r_i r_j}
+       \left[f_\perp(kr)-f_\parallel(kr)\right]
+       +\mu_{ij} f_\perp(kr)
+\end{equation}
+where ${\hat r_i}\cdot{\hat r}_j=\mu_{ij}$ is the cosine of the angle between the two objects and the geometrical functions, related to spherical bessel functions, are
+\begin{equation}
+    f_\perp(x)= (\sin x - x \cos x)/x^3 = j_1(x)/x
+\end{equation}
+and 
+\begin{equation}
+    f_\perp(x) - f_\parallel(x) = j_2(x) = \left[(3-x^2)\sin x - 3x\cos x\right]/x^2
+\end{equation}
+
+With $N$ and the $S_{,b}$ we can apply the BJK formalism directly. From some set of previous $P_b$, we calculate the step to the next iteration as
+\begin{equation}
+    \delta P_b = \sum_{b'}\frac12F^{-1}_{bb'}\mathrm{Tr}\left[(ss^T-C)(C^{-1}S_{,b'}C^{-1})\right]
+\end{equation}
+and the Fisher matrix is
+\begin{equation}
+    F_{bb}= \frac12\textrm{Tr}\left[C^{-1}S_{,b}C^{-1}S_{,b'}\right]
+\end{equation}
+where all matrix operations inside the square brackets, including the traces, are done on the (suppressed) $ij$ object indices (and so $ss^T$ is just $s_i s_j$)
+
+\bibliographystyle{plain}
+\bibliography{}
+\end{document}
