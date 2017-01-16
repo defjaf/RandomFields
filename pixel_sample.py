@@ -55,7 +55,7 @@ def pixelWindowCircle(nu, L):
        [J_1(x) = BesselJ(1,x)]
     area = pi R^2 so W_square(k,L) = 2 pi^(1/2) J_1[kL/pi^(1/2)]/kL
     
-    nb. k = angular frequency = nu * (2pi)
+    nb. k = angular frequency = nu * (2π)
     """
     k = nu * 2*math.pi
     kR = k * L /np.sqrt(np.pi)
@@ -73,7 +73,7 @@ def pixelWindow1D(nu, L):
         use azimuthally symmetrized square pixel formula: j_0(kL/2)
         (not completely sure this is right)
 
-    nb. k = angular frequency = nu * (2pi)
+    nb. k = angular frequency = nu * (2π)
     """
     k = nu * 2*math.pi
     kL2 = k * L/2
@@ -103,8 +103,8 @@ def pixelAverage(rlzn, width1d=2):
 def samplePower(Pk, ):
     """
     calculate the effect of sampling with spacing L on a power spectrum:
-    P_L(k) = \sum_n P(|k+2pi n/L|)
-        start with vector k=2pi m/(NL) and then average over angle m?
+    P_L(k) = \sum_n P(|k+2π n/L|)
+        start with vector k=2π m/(NL) and then average over angle m?
     """
     
     
