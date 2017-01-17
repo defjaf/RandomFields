@@ -263,7 +263,7 @@ def subsamplePower(Pk_fun, rshape, shrink_by=2, deltas=None, nk=10,
             #### unwindow this bin -- just use whatever the "last" k was 
             ### -- should be more careful but OK for narrow bins
             kout[ii+1] = np.mean(ki)
-            Pk[ii+1, jj] = powk.mean()/pixelWindowND(kout[ii+1], deltas*shrink_by, ndims)**2
+            Pk[ii+1, jj] = powk.mean()/pixelWindowND(kout[ii+1], deltas*shrink_by, ndims)**2 if len(powk) else 0
 
     Pk = np.squeeze(Pk)
     
