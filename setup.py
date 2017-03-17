@@ -20,6 +20,7 @@ setup(name='realization',
       url='http://github.com/defjaf/aniso',
       author='Andrew H. Jaffe',
       author_email='a.h.jaffe@gmail.com',
+      install_requires=['numpy', 'matplotlib', 'scipy'],
       packages=['realization']
 )
 
