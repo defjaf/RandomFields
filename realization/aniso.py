@@ -28,7 +28,7 @@ import numpy as N
 import numpy.random as Nr
 from matplotlib import pyplot as plt
 
-import realization
+from realization import realization
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
