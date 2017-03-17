@@ -7,6 +7,9 @@ Originally written to study anisotropic models (hence the name) but has also bee
 * Note that velocites.py is stand-alone.
 
 ### TODO:
-* Convert to a proper package format
-  * move driver code out of package?
+* move driver code out of package?
 * Split off "anisotropic" parts of aniso.py
+
+### DONE:
+* Convert to a proper package format
+
