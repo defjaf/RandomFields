@@ -3,10 +3,15 @@ make a realization of an 'ill-proportioned' toroidal universe with
 given P(k), excise a small cubic box, and examine the vector power
 spectrum P(|k|, angle)
 
+(Actually much more general than that.)
+
 """
 
+## TODO:
 #### need to make into a constant Delta f=i/Delta
 #### maybe make a class that carries along delta with it?
+#### split off excising/topology code (or at least make more clear in documentation
+####    that this is really a generally n-dim spectrum code
 
 from __future__ import division
 from __future__ import print_function
