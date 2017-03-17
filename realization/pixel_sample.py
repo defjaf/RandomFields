@@ -31,8 +31,8 @@ import scipy.special as sps
 
 import scipy.ndimage.filters as snf
 
-from realization import realization
-from realization import aniso
+import realization
+import aniso
 import itertools
 
 try:

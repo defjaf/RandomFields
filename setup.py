@@ -23,3 +23,11 @@ setup(name='realization',
       packages=['realization']
 )
 
+####  testing reminder 
+# virtualenv --python=python2 venvpy27
+# source venvpy27/bin/activate
+# python setup.py install
+
+# virtualenv --python=python3 venvpy3
+# source venvpy3/bin/activate
+# python setup.py install
