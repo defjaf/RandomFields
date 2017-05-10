@@ -50,10 +50,65 @@ def local_fNL(dims, fNL, Pk=None, deltas=None, return_config=False):
     else:
         return ng_field_fourier
         
+
+def get_fourier_dist(rlzn, deltas=None, nk=10, isFFT=True, eq_vol=False):):
+    """
+    get the distribution of fourier components in nk bins
+    """
+    
+    ### code below from aniso.getPower
+    
+    if deltas is None:
+        deltas=1
         
+    rshape = rlzn.shape
+    if isFFT:
+        rshape[-1] = 2*rshape[-1]-2
+        
+    ndims = len(rshape)
+
+    k = np.sqrt(realization.get_k2(rshape, deltas=deltas))
     
-    
-    
-    
+    if eq_vol:  ## actually want uniform in k**ndims
+        kk = np.linspace(0, k.max()**ndims, nk)**(1.0/ndims)
+    else:
+        kk = np.linspace(0, k.max(), nk)
 
 
+##### unmodified from getPower below here.
+
+    kout = np.zeros_like(kk)
+    Pk = np.empty(shape=nk, dtype=np.float64)
+    Sk = np.empty_like(Pk)
+    
+    Pk[0,:] = power.flat[0]   ## 0 is always the first DFT index...
+    Sk[0,:] = 0
+
+    for ii,ki in enumerate(pairwise(kk)):
+        kdxi = np.logical_and(k>ki[0], k<=ki[1])
+        for jj, aj in enumerate(pairwise(aa)):
+            if nangle>1:
+                adxj = np.logical_and(ang>aj[0], ang<=aj[1])
+                idx = np.logical_and(kdxi, adxj)
+            else:
+                idx = kdxi
+            Pk[ii+1, jj] = power[idx].mean()
+            Sk[ii+1, jj] = power[idx].std()
+        kout[ii+1] = np.mean(ki)
+
+        
+    Pk = np.squeeze(Pk)
+    Sk = np.squeeze(Sk)
+
+    volume = (np.array(deltas)*np.array(rshape)).prod()
+    Pk /= volume
+    Sk /= volume
+#     print("Volume=", volume)
+    ## normalization needed for 'volume factor' 
+    #      <dk dk'> = delta(k+k')P(k) => <d^2>=Vol*P(k)
+    
+    ## or always return the same thing?
+    if nangle > 1: 
+        return (kout, aa), Pk, Sk
+    else:
+        return kout, Pk, Sk
