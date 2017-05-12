@@ -20,6 +20,8 @@ import numbers
 import numpy as np
 import numpy.random as Nr
 
+import scipy.stats as sps
+
 from . import realization
 from . import aniso.pairwise as pairwise
 
@@ -95,45 +97,14 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30, isFFT=True, eq_vol=Fals
         kdxi = np.logical_and(k>ki[0], k<=ki[1])
         rlzn_bin = rlzn[kdxi]
         full_bin = np.hstack((rlzn.re(),rlzn.im())
-        if normalized:
-            full_normalized = (full_bin - full_bin.mean())/full_bin.std()
-            stats = (0,1,skewness(full_normalized), kurtosis(full_normalized))
-            histi = np.histogram(full_bin)
-        else:
-    
-##### unmodified from getPower below here.
-    
-    Pk = np.empty(shape=nk, dtype=np.float64)
-    Sk = np.empty_like(Pk)
-    
-    Pk[0,:] = power.flat[0]   ## 0 is always the first DFT index...
-    Sk[0,:] = 0
-
-    for ii,ki in enumerate(pairwise(kk)):
-        kdxi = np.logical_and(k>ki[0], k<=ki[1])
-        for jj, aj in enumerate(pairwise(aa)):
-            if nangle>1:
-                adxj = np.logical_and(ang>aj[0], ang<=aj[1])
-                idx = np.logical_and(kdxi, adxj)
-            else:
-                idx = kdxi
-            Pk[ii+1, jj] = power[idx].mean()
-            Sk[ii+1, jj] = power[idx].std()
-        kout[ii+1] = np.mean(ki)
-
+        if normalized
+            full_bin = (full_bin - full_bin.mean())/full_bin.std()
         
-    Pk = np.squeeze(Pk)
-    Sk = np.squeeze(Sk)
+        stati = sps.describe(full_bin)[2:]  #mean, var, skew, kurt
+        histi = np.histogram(full_bin, bins=nbins)
+        
+        stats.append(stati)
+        hists.append(histi)
+        
+        return stats, hists
 
-    volume = (np.array(deltas)*np.array(rshape)).prod()
-    Pk /= volume
-    Sk /= volume
-#     print("Volume=", volume)
-    ## normalization needed for 'volume factor' 
-    #      <dk dk'> = delta(k+k')P(k) => <d^2>=Vol*P(k)
-    
-    ## or always return the same thing?
-    if nangle > 1: 
-        return (kout, aa), Pk, Sk
-    else:
-        return kout, Pk, Sk
