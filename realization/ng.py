@@ -21,6 +21,7 @@ import numpy as np
 import numpy.random as Nr
 
 from . import realization
+from . import aniso.pairwise as pairwise
 
 def local_fNL(dims, fNL, Pk=None, deltas=None, return_config=False):
     """
@@ -42,7 +43,7 @@ def local_fNL(dims, fNL, Pk=None, deltas=None, return_config=False):
     ng_field = gaussian_field.copy()
     ng_field -= fNL*(gaussian_field**2 - gaussian_variance)
     
-    ng_field_fourier = numpy.fft.rfftn(ng_field)
+    ng_field_fourier = np.fft.rfftn(ng_field)
     
     ### anti-pattern: return depends on arguments!
     if return_config:
@@ -51,10 +52,18 @@ def local_fNL(dims, fNL, Pk=None, deltas=None, return_config=False):
         return ng_field_fourier
         
 
-def get_fourier_dist(rlzn, deltas=None, nk=10, isFFT=True, eq_vol=False):):
+def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30, isFFT=True, eq_vol=False):):
     """
-    get the distribution of fourier components in nk bins
+    get the distribution (histogram and summary statistics)
+    of fourier components in nk bands of k, nbins histogram bins
+    
+    
     """
+    
+    #TODO:
+    ## normalise to variance (power) in the bin?
+    ## return numpy hist output; plot elsewhere?
+    ## require same hist binning in all bands? or optimize?
     
     ### code below from aniso.getPower
     
@@ -74,10 +83,21 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, isFFT=True, eq_vol=False):):
     else:
         kk = np.linspace(0, k.max(), nk)
 
-
-##### unmodified from getPower below here.
-
     kout = np.zeros_like(kk)
+
+    ## fourier-space realization is complex: combine real and imag parts?
+    
+    ## just use lists so we can just append
+    stats = []
+    hists = []
+    
+    for ki in pairwise(kk):
+        kdxi = np.logical_and(k>ki[0], k<=ki[1])
+        rlzn_bin = rlzn[kdxi]
+        histi = np.hist(np.hstack((rlzn.re(),rlzn.im()))
+    
+##### unmodified from getPower below here.
+    
     Pk = np.empty(shape=nk, dtype=np.float64)
     Sk = np.empty_like(Pk)
     
