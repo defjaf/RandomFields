@@ -94,7 +94,12 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30, isFFT=True, eq_vol=Fals
     for ki in pairwise(kk):
         kdxi = np.logical_and(k>ki[0], k<=ki[1])
         rlzn_bin = rlzn[kdxi]
-        histi = np.hist(np.hstack((rlzn.re(),rlzn.im()))
+        full_bin = np.hstack((rlzn.re(),rlzn.im())
+        if normalized:
+            full_normalized = (full_bin - full_bin.mean())/full_bin.std()
+            stats = (0,1,skewness(full_normalized), kurtosis(full_normalized))
+            histi = np.histogram(full_bin)
+        else:
     
 ##### unmodified from getPower below here.
     
