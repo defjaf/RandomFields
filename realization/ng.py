@@ -101,24 +101,24 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30,
             ### or average over the actual k that contribute?
         
         rlzn_bin = rlzn[kdxi]
-        full_bin = np.hstack((rlzn.real,rlzn.imag))
+        full_bin = np.hstack((rlzn_bin.real,rlzn_bin.imag)).ravel()
         if normalized:
             full_bin = (full_bin - full_bin.mean())/full_bin.std()
         
-        stati = sps.describe(full_bin)[2:]  #mean, var, skew, kurt
+        stati = sps.describe(full_bin, axis=None)[2:]  #mean, var, skew, kurt
         histi = np.histogram(full_bin, bins=nbins)
         
         stats.append(stati)
         hists.append(histi)
         kout.append(kbin)
         
-        return kout, stats, hists
+    return np.array(kout), np.array(stats), hists
 
 
 def driver():
 
     dims = (256,256,256)
-    fNL = 1.0
+    fNL = 100.0
     deltas = None
     nk = 10
     nbins = 30
