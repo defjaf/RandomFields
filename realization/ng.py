@@ -22,8 +22,8 @@ import numpy.random as Nr
 
 import scipy.stats as sps
 
-from . import realization
-from . import aniso.pairwise as pairwise
+import realization
+from aniso import pairwise
 
 def local_fNL(dims, fNL, Pk=None, deltas=None, return_config=False):
     """
@@ -38,9 +38,9 @@ def local_fNL(dims, fNL, Pk=None, deltas=None, return_config=False):
     ### have to go into config space, so return that, or back to fourier?
     
     gaussian_field_fourier = realization.dft_realizn(dims, Pk=Pk, deltas=deltas)
-    gaussian_field = numpy.fft.irfftn(gaussian_field_fourier)
+    gaussian_field = np.fft.irfftn(gaussian_field_fourier)
     
-    gaussian_variance = np.variance(gaussian_field)
+    gaussian_variance = np.var(gaussian_field)
     
     ng_field = gaussian_field.copy()
     ng_field -= fNL*(gaussian_field**2 - gaussian_variance)
@@ -67,12 +67,12 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30,
     ## return numpy hist output; plot elsewhere?
     ## require same hist binning in all bands? or optimize?
     
-    ### code below from aniso.getPower
-    
+    ### code below from aniso.getPower
+        
     if deltas is None:
         deltas=1.0
         
-    rshape = rlzn.shape
+    rshape = list(rlzn.shape)
     if isFFT:
         rshape[-1] = 2*rshape[-1]-2
         
@@ -101,7 +101,7 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30,
             ### or average over the actual k that contribute?
         
         rlzn_bin = rlzn[kdxi]
-        full_bin = np.hstack((rlzn.re(),rlzn.im())
+        full_bin = np.hstack((rlzn.real,rlzn.imag))
         if normalized:
             full_bin = (full_bin - full_bin.mean())/full_bin.std()
         
