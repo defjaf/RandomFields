@@ -88,6 +88,7 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30, isFFT=True, eq_vol=Fals
     kout = np.zeros_like(kk)
 
     ## fourier-space realization is complex: combine real and imag parts?
+    ## how to deal with real-valued diagonal entries/mean 0?
     
     ## just use lists so we can just append
     stats = []
@@ -97,7 +98,7 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30, isFFT=True, eq_vol=Fals
         kdxi = np.logical_and(k>ki[0], k<=ki[1])
         rlzn_bin = rlzn[kdxi]
         full_bin = np.hstack((rlzn.re(),rlzn.im())
-        if normalized
+        if normalized:
             full_bin = (full_bin - full_bin.mean())/full_bin.std()
         
         stati = sps.describe(full_bin)[2:]  #mean, var, skew, kurt
