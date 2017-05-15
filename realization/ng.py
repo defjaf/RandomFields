@@ -54,11 +54,11 @@ def local_fNL(dims, fNL, Pk=None, deltas=None, return_config=False):
         return ng_field_fourier
         
 
-def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30, isFFT=True, eq_vol=False):):
+def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30, 
+                     isFFT=True, eq_vol=False, normalized=True):
     """
     get the distribution (histogram and summary statistics)
     of fourier components in nk bands of k, nbins histogram bins
-    
     
     """
     
@@ -70,7 +70,7 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30, isFFT=True, eq_vol=Fals
     ### code below from aniso.getPower
     
     if deltas is None:
-        deltas=1
+        deltas=1.0
         
     rshape = rlzn.shape
     if isFFT:
@@ -93,9 +93,13 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30, isFFT=True, eq_vol=Fals
     ## just use lists so we can just append
     stats = []
     hists = []
+    kout = []
     
     for ki in pairwise(kk):
         kdxi = np.logical_and(k>ki[0], k<=ki[1])
+        kbin = np.average(ki)   
+            ### or average over the actual k that contribute?
+        
         rlzn_bin = rlzn[kdxi]
         full_bin = np.hstack((rlzn.re(),rlzn.im())
         if normalized:
@@ -106,6 +110,23 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30, isFFT=True, eq_vol=Fals
         
         stats.append(stati)
         hists.append(histi)
+        kout.append(kbin)
         
-        return stats, hists
+        return kout, stats, hists
 
+
+def driver():
+
+    dims = (256,256,256)
+    fNL = 1.0
+    deltas = None
+    nk = 10
+    nbins = 30
+    
+    rlzn = local_fNL(dims, fNL, Pk=None, deltas=deltas, return_config=False)
+    
+    kout, stats, hists = get_fourier_dist(rlzn, deltas=deltas, nk=nk, nbins=nbins, 
+                     isFFT=True, eq_vol=False, normalized=True)
+                     
+    return kout, stats, hists
+    
