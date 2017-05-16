@@ -122,11 +122,13 @@ def driver():
     deltas = None
     nk = 10
     nbins = 30
+    eq_vol=False
+    Pk = -2
     
-    rlzn = local_fNL(dims, fNL, Pk=None, deltas=deltas, return_config=False)
+    rlzn = local_fNL(dims, fNL, Pk=Pk, deltas=deltas, return_config=False)
     
     kout, stats, hists = get_fourier_dist(rlzn, deltas=deltas, nk=nk, nbins=nbins, 
-                     isFFT=True, eq_vol=False, normalized=True)
+                     isFFT=True, eq_vol=eq_vol, normalized=True)
                      
     return kout, stats, hists
     
