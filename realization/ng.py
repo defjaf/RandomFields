@@ -25,7 +25,7 @@ import scipy.stats as sps
 import realization
 from aniso import pairwise
 
-def local_fNL(dims, fNL, Pk=None, deltas=None, return_config=False):
+def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False):
     """
     make a realization of local fNL non-Gaussianity: 
         f = g + fNL(g^2 - <g^2>)
@@ -39,11 +39,11 @@ def local_fNL(dims, fNL, Pk=None, deltas=None, return_config=False):
     
     gaussian_field_fourier = realization.dft_realizn(dims, Pk=Pk, deltas=deltas)
     gaussian_field = np.fft.irfftn(gaussian_field_fourier)
-    
-    gaussian_variance = np.var(gaussian_field)
+        
+    gaussian_offset = np.mean(gaussian_field**ng_pow)
     
     ng_field = gaussian_field.copy()
-    ng_field -= fNL*(gaussian_field**2 - gaussian_variance)
+    ng_field += fNL*(gaussian_field**ng_pow - gaussian_offset)
     
     ng_field_fourier = np.fft.rfftn(ng_field)
     
@@ -115,17 +115,17 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30,
     return np.array(kout), np.array(stats), hists
 
 
-def driver():
+def driver(dims = (256,256,256),
+            fNL = 1000.0,
+            deltas = None,
+            nk = 10,
+            nbins = 30,
+            eq_vol=False,
+            Pk = -2,
+            ng_pow=2):
 
-    dims = (256,256,256)
-    fNL = 100.0
-    deltas = None
-    nk = 10
-    nbins = 30
-    eq_vol=False
-    Pk = -2
     
-    rlzn = local_fNL(dims, fNL, Pk=Pk, deltas=deltas, return_config=False)
+    rlzn = local_fNL(dims, fNL, Pk=Pk, deltas=deltas, return_config=False, ng_pow=ng_pow)
     
     kout, stats, hists = get_fourier_dist(rlzn, deltas=deltas, nk=nk, nbins=nbins, 
                      isFFT=True, eq_vol=eq_vol, normalized=True)
