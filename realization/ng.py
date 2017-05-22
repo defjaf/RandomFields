@@ -25,11 +25,11 @@ import scipy.stats as sps
 import realization
 from aniso import pairwise
 
-def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False, fG=1):
+def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False, fG=1.0):
     """
     make a realization of local fNL non-Gaussianity: 
-        f = fG*g + fNL(g^2 - <g^2>)
-    where g is a Gaussian field. 
+        f = fG*g + fNL(g^p - <g^p>)
+    where g is a Gaussian field and p is a power. If p<0, ignore the offset term.
     
     dims, Pk, deltas are as in 
         realization.dft_realizn(dims, Pk=None, deltas=None)
@@ -40,7 +40,7 @@ def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False, fG
     gaussian_field_fourier = realization.dft_realizn(dims, Pk=Pk, deltas=deltas)
     gaussian_field = np.fft.irfftn(gaussian_field_fourier)
         
-    gaussian_offset = np.mean(gaussian_field**ng_pow)
+    gaussian_offset = np.mean(gaussian_field**ng_pow) if ng_pow>0 else 0.0
     
     ng_field = fG*gaussian_field.copy()
     ng_field += fNL*(gaussian_field**ng_pow - gaussian_offset)
