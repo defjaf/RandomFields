@@ -13,6 +13,7 @@ smaller than the box).
 
 from __future__ import division
 from __future__ import with_statement
+from __future__ import print_function
 
 import math
 import numbers
@@ -25,11 +26,13 @@ import scipy.stats as sps
 import realization
 from aniso import pairwise
 
-def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False, fG=1.0):
+def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False, fG=1.0, transform=None):
     """
     make a realization of local fNL non-Gaussianity: 
         f = fG*g + fNL(g^p - <g^p>)
     where g is a Gaussian field and p is a power. If p<0, ignore the offset term.
+    
+    or, supply a function transform(g)
     
     dims, Pk, deltas are as in 
         realization.dft_realizn(dims, Pk=None, deltas=None)
@@ -40,10 +43,19 @@ def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False, fG
     gaussian_field_fourier = realization.dft_realizn(dims, Pk=Pk, deltas=deltas)
     gaussian_field = np.fft.irfftn(gaussian_field_fourier)
         
-    gaussian_offset = np.mean(gaussian_field**ng_pow) if ng_pow>0 else 0.0
+    if transform is not None:
+        try:
+            ng_field = transform(gaussian_field.copy())
+        except NameError:
+            print("Must supply a callable transform")
+            raise
     
-    ng_field = fG*gaussian_field.copy()
-    ng_field += fNL*(gaussian_field**ng_pow - gaussian_offset)
+    if transform is None:
+        gaussian_offset = np.mean(gaussian_field**ng_pow) if ng_pow>0 else 0.0
+
+        ng_field = fG*gaussian_field.copy()
+        ng_field += fNL*(gaussian_field**ng_pow - gaussian_offset)
+        
     
     ng_field_fourier = np.fft.rfftn(ng_field)
     
@@ -122,10 +134,13 @@ def driver(dims = (256,256,256),
             nbins = 30,
             eq_vol=False,
             Pk = -2,
-            ng_pow=2, fG=1.0):
+            ng_pow=2, fG=1.0,
+            transform=None):
 
     
-    rlzn = local_fNL(dims, fNL, Pk=Pk, deltas=deltas, return_config=False, ng_pow=ng_pow, fG=fG)
+    rlzn = local_fNL(dims, fNL, 
+                     Pk=Pk, deltas=deltas, return_config=False, ng_pow=ng_pow, 
+                     fG=fG, transform=transform)
     
     kout, stats, hists = get_fourier_dist(rlzn, deltas=deltas, nk=nk, nbins=nbins, 
                      isFFT=True, eq_vol=eq_vol, normalized=True)
