@@ -9,13 +9,13 @@ Originally written to study anisotropic models (hence the name) but has also bee
  * sub-pixel 2-D aliasing.
  * PDF of non-Gaussianity (see Matsubara 2008)
 
-* Note that velocites.py is stand-alone.
+* Note that velocites.py has command-line code.
 
 ### TODO:
 * move driver code out of package?
-* Split off "anisotropic" parts of aniso.py
 
 ### DONE:
 * Convert to a proper package format
 * rename on github?
+* Split off "anisotropic" parts of aniso.py
 
