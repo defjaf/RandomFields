@@ -1,4 +1,6 @@
-# `aniso`
+# `RandomFields`
+
+(Formerly called `aniso`; python package is called `realization`.)
 
 Code (and iPython notebooks) to generate and manipulate realizations of cosmological random fields.
 
