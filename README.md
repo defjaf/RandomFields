@@ -14,8 +14,8 @@ Originally written to study anisotropic models (hence the name) but has also bee
 ### TODO:
 * move driver code out of package?
 * Split off "anisotropic" parts of aniso.py
-* rename on github?
 
 ### DONE:
 * Convert to a proper package format
+* rename on github?
 
