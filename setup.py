@@ -17,14 +17,14 @@ with open("README.md", "rb") as f:
 setup(name='realization',
       version=version,
       description='Realizations and spectra of n-dim Gaussian random fields.',
-      url='http://github.com/defjaf/aniso',
+      url='http://github.com/defjaf/RandomFields',
       author='Andrew H. Jaffe',
       author_email='a.h.jaffe@gmail.com',
       install_requires=['numpy', 'matplotlib', 'scipy'],
       packages=['realization']
 )
 
-####  testing reminder 
+####  testing reminder
 # virtualenv --python=python2 venvpy27
 # source venvpy27/bin/activate
 # python setup.py install
