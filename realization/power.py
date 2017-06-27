@@ -59,8 +59,8 @@ def bbks(k, ns=1, Omegam=0.3, h=0.72):
 
 def gaussian(k, sigma_k=1.0):
     """ return unnormalized Gaussian power spectrum exp[-(k/sigma_k)^2/2] """
-    return np.exp(-0.5*(k/sigma_k)^2)
-    
+    return np.exp(-0.5*(k/sigma_k)**2)
+
 
 def sigma2_R(Pk, R=8, kpow=0, prefac=1):
     """
