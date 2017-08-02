@@ -61,7 +61,7 @@ def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False,
 
     if excise is not None and excise>1:
         ex_dims = [(int(min(dims)/excise),)]*len(dims)
-        # print('Excising region of dimensions: ', ex_dims)
+        # print('Excising region of dimensions: ', ex_dims)
         ex_ng_field = aniso.excise(ng_field, ex_dims)
 
         ng_field = ex_ng_field
