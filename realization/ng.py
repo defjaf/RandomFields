@@ -10,6 +10,8 @@ smaller than the box).
 
 """
 
+### TODO: add excising a region to local_fNL:
+
 
 from __future__ import division
 from __future__ import with_statement
@@ -24,9 +26,10 @@ import numpy.random as Nr
 import scipy.stats as sps
 
 import realization
-from aniso import pairwise
+import aniso
 
-def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False, fG=1.0, transform=None):
+def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False,
+              fG=1.0, transform=None, excise=None):
     """
     make a realization of local fNL non-Gaussianity:
         f = fG*g + fNL(g^p - <g^p>)
@@ -55,6 +58,14 @@ def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False, fG
 
         ng_field = fG*gaussian_field.copy()
         ng_field += fNL*(gaussian_field**ng_pow - gaussian_offset)
+
+    if excise is not None and excise>1:
+        ex_dims = [(int(min(dims)/excise),)]*len(dims)
+        print('Excising region of dimensions: ', ex_dims)
+        ex_ng_field = aniso.excise(ng_field, ex_dims)
+
+        ng_field = ex_ng_field
+        ## or should we return both for comparison???
 
 
     ng_field_fourier = np.fft.rfftn(ng_field)
@@ -107,7 +118,7 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30,
     hists = []
     kout = []
 
-    for ki in pairwise(kk):
+    for ki in aniso.pairwise(kk):
         kdxi = np.logical_and(k>ki[0], k<=ki[1])
         kbin = np.average(ki)
             ### or average over the actual k that contribute?
@@ -135,12 +146,15 @@ def driver(dims = (256,256,256),
             eq_vol=False,
             Pk = -2,
             ng_pow=2, fG=1.0,
+            excise = 1,
             transform=None):
-
 
     rlzn = local_fNL(dims, fNL,
                      Pk=Pk, deltas=deltas, return_config=False, ng_pow=ng_pow,
-                     fG=fG, transform=transform)
+                     fG=fG, transform=transform, excise=excise)
+
+    ###nb. each entry is a tuple that will be turned into a slice
+
 
     kout, stats, hists = get_fourier_dist(rlzn, deltas=deltas, nk=nk, nbins=nbins,
                      isFFT=True, eq_vol=eq_vol, normalized=True)
