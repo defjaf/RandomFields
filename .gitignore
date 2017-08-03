@@ -4,3 +4,7 @@ __pycache__/
 *$py.class
 .ipynb_checkpoints/
 realization.egg-info/
+docs/BJKflows.pdf
+txt/bigtosmall.txt
+txt/bigobjects.txt
+txt/allfileshas.txt
