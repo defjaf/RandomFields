@@ -10,8 +10,7 @@ smaller than the box).
 
 """
 
-### TODO: add excising a region to local_fNL:
-
+### DONE: add excising a region to local_fNL:
 
 from __future__ import division
 from __future__ import with_statement
