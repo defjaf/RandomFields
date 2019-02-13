@@ -18,8 +18,8 @@ Created by Andrew H. Jaffe on 2009-12-11.
 Copyright (c) 2009 Imperial College London. All rights reserved.
 """
 
-from __future__ import division
-from __future__ import with_statement
+
+
 
 import math
 import sys
@@ -37,13 +37,13 @@ try:
     import matplotlib.pyplot as plt
 except ImportError:
     canPlot = False
-    print "can't plot"
+    print("can't plot")
 
 import numpy.random as rnd
 
-import realization as rlzn
+from . import realization as rlzn
 
-import power
+from . import power
 
 ### NB fourier conventions
 ## rfftn: F_k = \sum_n f_n exp(-2pi ikn/N)
@@ -244,7 +244,7 @@ class FieldWithVelocities(Field):
         return self.deltas*idxs, vels
 
 
-def processCatalog(posns, vels, verr=0, nonlin=0, ctr=(0,0,0), lens=(1,1,1)):
+def processCatalog(posns, vels, verr=0, nonlin=0, ctr=(0, 0, 0), lens=(1, 1, 1)):
     """
        re-center catalog at an arbitrary point in the volume
        convert n-d velocity catalog to radial velocities. 
@@ -279,7 +279,7 @@ def plotcatalog(cat):
     
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(cat[:,0], cat[:,1], cat[:,2])
+    ax.scatter(cat[:, 0], cat[:, 1], cat[:, 2])
     plt.show()
     
     
@@ -287,12 +287,12 @@ def toPolar(pos, deg=True):
     """ convert a shape=(:, 3) cartesian coordinate array to polars """
     r = np.sqrt((pos**2).sum(axis=-1))
     if deg:
-        theta = 90-np.degrees(np.arccos(pos[:,2]/r))
-        phi = np.degrees(np.arctan2(pos[:,1], pos[:,0]))
+        theta = 90-np.degrees(np.arccos(pos[:, 2]/r))
+        phi = np.degrees(np.arctan2(pos[:, 1], pos[:, 0]))
     else:
-        theta = np.pi/2-np.arccos(pos[:,2]/r)
-        phi = np.arctan2(pos[:,1], pos[:,0])
-    return np.vstack((r,theta,phi)).transpose()
+        theta = np.pi/2-np.arccos(pos[:, 2]/r)
+        phi = np.arctan2(pos[:, 1], pos[:, 0])
+    return np.vstack((r, theta, phi)).transpose()
     
     
 def generate_velocity_catalog(N=256, nbar=500, length=100, verr=1000, nonlin=250,
@@ -316,11 +316,11 @@ def generate_velocity_catalog(N=256, nbar=500, length=100, verr=1000, nonlin=250
     
     powspec = power.PowSpec(power.bbks, smooth=0)
     
-    fk = rlzn.dft_realizn(shape,Pk=powspec, deltas=deltas) 
+    fk = rlzn.dft_realizn(shape, Pk=powspec, deltas=deltas) 
     
     dipole2 = power.sigma2_R(powspec, R=length/2.0, kpow=-2, prefac=(a0H0*fgrav)**2)
     dipole_rms = math.sqrt(dipole2)     ## REALLY SHOULD BE FULL BOX, NOT SPHERE
-    print "#dipole v_rms = %f" % dipole_rms
+    print("#dipole v_rms = %f" % dipole_rms)
 
     field = FieldWithVelocities(delta_k=fk, deltas=deltas, dipole_rms=dipole_rms)
     
@@ -339,15 +339,15 @@ def generate_velocity_catalog(N=256, nbar=500, length=100, verr=1000, nonlin=250
         polar = toPolar(pos)
     
         if stdout:
-            print ("#%5s %8s %8s %8s %8s %8s %8s %8s" %
-                   ("i", "r", "theta", "phi" ,"v_x","v_y","v_z", "S_r"))
+            print(("#%5s %8s %8s %8s %8s %8s %8s %8s" %
+                   ("i", "r", "theta", "phi", "v_x", "v_y", "v_z", "S_r")))
             for i, xyz_vxyz_vr in enumerate(zip(polar, vel, vr)):
-                (r,t,p), (vx, vy, vz), vr  = xyz_vxyz_vr
+                (r, t, p), (vx, vy, vz), vr  = xyz_vxyz_vr
             
-                print (" %5d %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f" %
-                       (i, r,t,p, vx,vy,vz, vr))
+                print((" %5d %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f" %
+                       (i, r, t, p, vx, vy, vz, vr)))
     else:
-        print("No output for ndim=%d" % ndim)
+        print(("No output for ndim=%d" % ndim))
 
     if ret:
         return field, pos, vel, vr
@@ -378,7 +378,7 @@ def driver():
     
     for i in range(nrun):
         fname = "SFI_mock_%d.txt" % i
-        print "file ", fname
+        print("file ", fname)
         old_stdout = sys.stdout
         with open(fname, 'w') as sys.stdout:
             main(opts)
@@ -404,8 +404,8 @@ def main(options=None):
                           help="plot with matplotlib")
         (options, args) = parser.parse_args()
     else:
-        print ("# npoints=%d nbar=%d length=%6.1fMpc verr=%6.1fkm/s nonlin=%6.1fkm/s" %
-               (options.npoints, options.nbar, options.length, options.verr, options.nonlin))
+        print(("# npoints=%d nbar=%d length=%6.1fMpc verr=%6.1fkm/s nonlin=%6.1fkm/s" %
+               (options.npoints, options.nbar, options.length, options.verr, options.nonlin)))
 
     generate_velocity_catalog(N=options.npoints, nbar=options.nbar, length=options.length, 
                      verr=options.verr, nonlin=options.nonlin,

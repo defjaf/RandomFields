@@ -9,8 +9,8 @@ arbitrary number of dimensions and number of points in each
 #### maybe make a class that carries along delta with it? (see velocities.Field)
 #### 
 
-from __future__ import division
-from __future__ import with_statement
+
+
 
 import math
 import numbers
@@ -97,7 +97,7 @@ def DFT_indices(dimensions, dtype=np.int_, dim1=None, real=False):
     lst = []
     
     if dim1 is None:
-        dim1 = range(ndims)
+        dim1 = list(range(ndims))
     
     for i in dim1:
         d = dims[i]

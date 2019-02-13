@@ -83,7 +83,7 @@ def sigma2_R(Pk, R=8, kpow=0, prefac=1):
 #    s2, err =  spi.quad(PkIntegrand_lnk, -30, 30)
 
     if err/s2 > 0.1:
-        print "sig2 calc: err, s2 = ", err, s2
+        print("sig2 calc: err, s2 = ", err, s2)
 
     return s2*prefac
 

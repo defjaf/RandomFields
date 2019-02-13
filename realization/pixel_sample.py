@@ -19,7 +19,7 @@ DONE: check mode-by-mode (kx, ky) pixel windows
 ### nb. 
 
 
-from __future__ import print_function
+
 
 import math
 from distutils.version import LooseVersion
@@ -31,21 +31,16 @@ import scipy.special as sps
 
 import scipy.ndimage.filters as snf
 
-import realization
-import aniso
+from . import realization
+from . import aniso
 import itertools
 
-try:
-    from itertools import izip
-except ImportError:
-    izip = zip
-    
     
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
     a, b = itertools.tee(iterable)
     next(b, None)
-    return izip(a, b)
+    return zip(a, b)
     
 
 def pixelWindowCircle(nu, L):
@@ -128,7 +123,7 @@ def pixelSample(rlzn, nsamples=None, shrink_by=2):
     print("len=%d" % rlzn.size)
     
     ## check that the the new shape is comensurate with the old shape
-    assert all(s_out*shrink_by==s_in for s_in,s_out in zip(shape_in, shape_out))
+    assert all(s_out*shrink_by==s_in for s_in, s_out in zip(shape_in, shape_out))
     
     ### could use np.random.choice on the flattened array, 
     ###  but it's easier to track the actual array indices
@@ -136,7 +131,7 @@ def pixelSample(rlzn, nsamples=None, shrink_by=2):
     vals = rlzn.ravel()[idxs_1d]
     print("vals[%d]: %g ± %g" % (vals.size, vals.mean(), vals.std()))
 
-    idxs_nd = np.unravel_index(idxs_1d,shape_in)
+    idxs_nd = np.unravel_index(idxs_1d, shape_in)
     
     idxs_nd_sampled = (np.array(idxs_nd, dtype=np.int)//shrink_by).transpose()
     rlzn_sampled = np.zeros(shape_out)
@@ -148,7 +143,7 @@ def pixelSample(rlzn, nsamples=None, shrink_by=2):
         
     idxs_good = (n_in_pix>0)
     print("final shape:", idxs_good.shape)
-    print("good/total: %d/%d" % (idxs_good.sum(),idxs_good.size))
+    print("good/total: %d/%d" % (idxs_good.sum(), idxs_good.size))
     
     rlzn_sampled[idxs_good] /= n_in_pix[idxs_good] 
     print("orig: %g ± %g" % (rlzn.mean(), rlzn.std()))
@@ -224,21 +219,21 @@ def subsamplePower(Pk_fun, rshape, shrink_by=2, deltas=None, nk=10,
         kk = np.linspace(0, k.max(), nk)
     kout = np.zeros_like(kk)
     aa = np.linspace(0, 2*np.pi, nangle+1)
-    Pk = np.zeros(shape=(nk,nangle), dtype=np.float64)
+    Pk = np.zeros(shape=(nk, nangle), dtype=np.float64)
 
 ### iterating over all combinations of the -n...+n range
 ### see http://stackoverflow.com/questions/1208118/using-numpy-to-build-an-array-of-all-combinations-of-two-arrays
     ### nmaxs should really depend on where you are, such that the ktot<kmax
     ### therefore should really be inside the innermost loop below (see abs(ktot) check)
     nmaxs = (nmax,)*ndims  ### can be different in each direction
-    rr = np.array([range(-nm,nm+1) for nm in nmaxs])
+    rr = np.array([list(range(-nm, nm+1)) for nm in nmaxs])
     kiter = np.array(np.meshgrid(*rr), dtype=np.float).T.reshape(-1, ndims)
     rfac = np.array(shrink_by, dtype=np.float)*np.array(deltas, dtype=np.float)
     kiter /= rfac   ## rescaling from raw pixels to the samples
 #     print("rfac=", rfac)
 #     print("kiter=", kiter)
     
-    for ii,ki in enumerate(pairwise(kk)):   ### need to iterate over full k_vec in the bin as well.
+    for ii, ki in enumerate(pairwise(kk)):   ### need to iterate over full k_vec in the bin as well.
         kdxi = np.logical_and(k>ki[0], k<=ki[1])
         for jj, aj in enumerate(pairwise(aa)):
             if nangle>1:
@@ -248,7 +243,7 @@ def subsamplePower(Pk_fun, rshape, shrink_by=2, deltas=None, nk=10,
                 idx = kdxi
                 
             ## here, idx has list pointing into power, or k
-            kvec_bin = kvec[:,idx].transpose()
+            kvec_bin = kvec[:, idx].transpose()
             powk = np.zeros(idx.sum())  ### hold the aliased power
 
             for ip, kv in enumerate(kvec_bin):
@@ -281,6 +276,9 @@ def subsamplePower(Pk_fun, rshape, shrink_by=2, deltas=None, nk=10,
     if nangle > 1: 
         return (kout), Pk
     else:
+        ### AHJ remove P(k)=0 points. Is this really what we want to do?
+        #### No? Fix by adding "nonposy='mask' in plot.
+ #       return kout[Pk>0], Pk[Pk>0]
         return kout, Pk
 
 
@@ -295,7 +293,7 @@ def samplingNoise():
     """
 
     
-def driver(n=0, dims=(512,512), deltas=1, nsamples=1e6, shrink_by=2, 
+def driver(n=0, dims=(512, 512), deltas=1, nsamples=1e6, shrink_by=2, 
            nk=20,allplots=False, eq_vol=False, maps=True, plot_ratio=True,
            cutraw=2, title=""):
 
@@ -341,7 +339,7 @@ def driver(n=0, dims=(512,512), deltas=1, nsamples=1e6, shrink_by=2,
                                 eq_vol=eq_vol)
     eP *= fac; eS *= fac
 
-    print('P[0]/eP[0]=%g, shrink**4=%g' % (P[0]/eP[0],fac))
+    print('P[0]/eP[0]=%g, shrink**4=%g' % (P[0]/eP[0], fac))
     
     ### mode-by-mode correction for pixel window:
     sampled_delta_r_unwindowed = unWindow(sampled_delta_r, deltas=deltas*shrink_by)
@@ -355,7 +353,9 @@ def driver(n=0, dims=(512,512), deltas=1, nsamples=1e6, shrink_by=2,
     ak, aP, aS = aniso.getPower(avg_delta_r, nk=nk*shrink_by, deltas=deltas, eq_vol=eq_vol)
     
     ### running average, subsampled
-    sampled_avg_delta_r = avg_delta_r[[slice(None, None, shrink_by)]*ndims]
+    ### AHJ "tuple" fixes a deprecation warning of the differences between arrays and tuples
+    ### as indexes
+    sampled_avg_delta_r = avg_delta_r[tuple([slice(None, None, shrink_by)]*ndims)]
 
     eak, eaP, eaS = aniso.getPower(sampled_avg_delta_r, nk=nk, deltas=deltas*shrink_by, 
                                 eq_vol=eq_vol)
@@ -386,7 +386,7 @@ def driver(n=0, dims=(512,512), deltas=1, nsamples=1e6, shrink_by=2,
     if pixelWindow:
     
         ### sampled n_out pixels
-        pixwin2 = pixelWindow(ek,deltas*shrink_by)**2  ### only work for scalar deltas
+        pixwin2 = pixelWindow(ek, deltas*shrink_by)**2  ### only work for scalar deltas
         #pixwin2 /= pixelWindow(ek,deltas)**2 ### divide by single-pixel window (doesn't matter?)
         eP_unwin= eP/pixwin2
         eS_unwin= eS/pixwin2
@@ -395,7 +395,7 @@ def driver(n=0, dims=(512,512), deltas=1, nsamples=1e6, shrink_by=2,
         eaS_unwin= eaS/pixwin2
         
         ### full n_in pixels
-        pixwin2a = pixelWindow(ak,deltas*shrink_by)**2  ### only work for scalar deltas
+        pixwin2a = pixelWindow(ak, deltas*shrink_by)**2  ### only work for scalar deltas
         #pixwin2a /= pixelWindow(ak,deltas)**2 ### divide by single-pixel window (doesn't matter?)
         aP_unwin= aP/pixwin2a
         aS_unwin= aS/pixwin2a
@@ -437,7 +437,7 @@ def driver(n=0, dims=(512,512), deltas=1, nsamples=1e6, shrink_by=2,
         
 #       plt.loglog(ek[1:], eP_unwin[1:]+eS_unwin[1:])
     if plot_aliased_theory:
-        plt.loglog(k_aliased[1:], P_aliased[1:], marker=None, color=colors[8], label='aliased theory')
+        plt.loglog(k_aliased[1:], P_aliased[1:], marker=None, color=colors[8], label='aliased theory', nonposy='mask')
         
     plt.legend(loc='best', frameon=False)
     plt.xlim(ek[1:].min(), ek[1:].max())
@@ -449,7 +449,7 @@ def driver(n=0, dims=(512,512), deltas=1, nsamples=1e6, shrink_by=2,
     if ndims==2:
         if not cutraw:
             plt.axvline(k.max()/math.sqrt(2), ls='dotted', c='grey')
-        plt.axvline(ek.max()/math.sqrt(2),ls='dotted', c='grey')
+        plt.axvline(ek.max()/math.sqrt(2), ls='dotted', c='grey')
 
     
     if plot_ratio:
@@ -468,10 +468,11 @@ def driver(n=0, dims=(512,512), deltas=1, nsamples=1e6, shrink_by=2,
             rplotter(eak[1:], eaP_unwin[1:]/Pk_theory[:len(ek)-1], 
                         label="sampled, avg unwin/theory", marker=None, color=colors[7])
         if plot_aliased_theory:
-            rplotter(k_aliased[1:], P_aliased[1:]/Pk(2*np.pi*k_aliased[1:]), label='aliased/theory', color=colors[8], marker=mrkr)
+            rplotter(k_aliased[1:], P_aliased[1:]/Pk(2*np.pi*k_aliased[1:]), label='aliased/theory', 
+                     color=colors[8], marker=mrkr, nonposy='mask')
         plt.xlim(ek[1:].min(), ek[1:].max())
         plt.ylim(0.5, 5.0)
-        plt.axhline(1.0,ls='dotted', c='grey')
+        plt.axhline(1.0, ls='dotted', c='grey')
         plt.legend(loc='best', frameon=False)
         plt.title(title)
 
@@ -486,14 +487,14 @@ def driver(n=0, dims=(512,512), deltas=1, nsamples=1e6, shrink_by=2,
         nc = int(nrc/nr)
         if nr*nc<nrc: nc += 1
 
-        for i in xrange(1,nk):
+        for i in range(1, nk):
             plt.subplot(nr, nc, i)
             ang, rlzk, k = aniso.getAngDist(sampled_delta_r, i, nk=nktot)
             std = np.sqrt(((np.absolute(rlzk))**2).mean())
             plt.plot(ang, rlzk.real, '.')
             plt.plot(ang, rlzk.imag, '.')
-            plt.plot([0,math.pi], [std,std], 'r')
-            plt.plot([0,math.pi], [-std,-std], 'r')
+            plt.plot([0, math.pi], [std, std], 'r')
+            plt.plot([0, math.pi], [-std, -std], 'r')
             ax = plt.gca()
             lab = r'$k=%f$' % k
             plt.text(0.1, 0.9, lab, transform = ax.transAxes)
@@ -509,7 +510,7 @@ def driver(n=0, dims=(512,512), deltas=1, nsamples=1e6, shrink_by=2,
         plt.figure()
         lentot = len(delta_r)
         plt.plot(np.arange(lentot), delta_r, label=r'raw $\delta({\bf r})$')
-        plt.plot(np.arange(0,lentot,shrink_by), sampled_delta_r, label='sampled')
+        plt.plot(np.arange(0, lentot, shrink_by), sampled_delta_r, label='sampled')
         plt.legend(loc='best', frameon=False)
         plt.title(r'$\delta({\bf r}$)')
 

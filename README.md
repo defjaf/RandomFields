@@ -23,3 +23,4 @@ Note that `velocites.py` has command-line code.
 * Convert to a proper package format
 * rename on github?
 * Split off "anisotropic" parts of aniso.py
+* Conversion to Python3 (Feb 2019)

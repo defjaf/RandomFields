@@ -12,9 +12,9 @@ smaller than the box).
 
 ### DONE: add excising a region to local_fNL:
 
-from __future__ import division
-from __future__ import with_statement
-from __future__ import print_function
+
+
+
 
 import math
 import numbers
@@ -24,8 +24,8 @@ import numpy.random as Nr
 
 import scipy.stats as sps
 
-import realization
-import aniso
+from . import realization
+from . import aniso
 
 def local_fNL(dims, fNL, Pk=None, deltas=None, ng_pow=2, return_config=False,
               fG=1.0, transform=None, excise=None):
@@ -123,7 +123,7 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30,
             ### or average over the actual k that contribute?
 
         rlzn_bin = rlzn[kdxi]
-        full_bin = np.hstack((rlzn_bin.real,rlzn_bin.imag)).ravel()
+        full_bin = np.hstack((rlzn_bin.real, rlzn_bin.imag)).ravel()
         if normalized:
             full_bin = (full_bin - full_bin.mean())/full_bin.std()
 
@@ -137,7 +137,7 @@ def get_fourier_dist(rlzn, deltas=None, nk=10, nbins=30,
     return np.array(kout), np.array(stats), hists
 
 
-def driver(dims = (256,256,256),
+def driver(dims = (256, 256, 256),
             fNL = 1000.0,
             deltas = None,
             nk = 10,
