@@ -253,6 +253,7 @@ def subsamplePower(Pk_fun, rshape, shrink_by=2, deltas=None, nk=10,
                     if np.all(np.abs(ktot)<=0.5):
                         kabs = np.sqrt((ktot**2).sum())
                         pixwin = pixelWindowND(kabs, deltas*shrink_by, ndims)
+                        assert(callable(Pk_fun))
                         powk[ip] += Pk_fun(2*math.pi*kabs)*pixwin**2
 
             ## k[idx]
@@ -297,12 +298,12 @@ def driver(n=0, dims=(512, 512), deltas=1, nsamples=int(1e6), shrink_by=2,
            nk=20,allplots=False, eq_vol=False, maps=True, plot_ratio=True,
            cutraw=2, title=""):
 
-    plot_aliased_theory=True
+    plot_aliased_theory=False
     
     print ('dims=', dims)
     ndims = len(dims)
     
-    Pk = n
+    Pk = n   ### this is wrong -- never gets set to a callable.
         
     deltas = 1 if deltas is None else deltas
     
