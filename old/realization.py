@@ -14,8 +14,8 @@ from __future__ import with_statement
 import math
 import numbers
 
-import numpy as N
-import numpy.random as Nr
+import numpy as np
+import numpy.random as npr
 
 # from operator import isNumberType
 
@@ -50,25 +50,25 @@ def dft_realizn(dims, Pk=None, deltas=None):
     if isinstance(Pk, numbers.Number):
         if Pk<0:
             def Pkn(k):
-                with N.errstate(divide='ignore', invalid='ignore'):
-                    return N.where(k<=0, 0, k**Pk)
+                withnp.errstate(divide='ignore', invalid='ignore'):
+                    returnnp.where(k<=0, 0, k**Pk)
         else:
             def Pkn(k):
                 return k**Pk
     else:
         Pkn = Pk
     
-    wr = Nr.standard_normal(size=dims)  ## white noise
-    wk = N.fft.rfftn(wr)
+    wr = npr.standard_normal(size=dims)  ## white noise
+    wk =np.fft.rfftn(wr)
     # why no normalization here? [see getPower*() below]
     
     if Pk is None:
         return wk
     else:
-        return wk*N.sqrt(Pkn(N.sqrt(get_k2(dims, deltas=deltas))))
+        return wk*np.sqrt(Pkn(np.sqrt(get_k2(dims, deltas=deltas))))
 
 
-def DFT_indices(dimensions, dtype=N.int_, dim1=None, real=False):
+def DFT_indices(dimensions, dtype=np.int_, dim1=None, real=False):
     """DFT_indices(dimensions,dtype=int_) returns an array representing a grid
     of DFT indices with row-only, and column-only variation.
     A DFT index is defined so that they go (0, 1, 2, .... N/2, -(N/2-1), .... -1)
@@ -84,7 +84,7 @@ def DFT_indices(dimensions, dtype=N.int_, dim1=None, real=False):
     dims = list(dimensions)
     ndims = len(dims)
     if real: dims[-1]=dims[-1]/2+1
-    tmp = N.ones(dims, dtype)
+    tmp =np.ones(dims, dtype)
     lst = []
     
     if dim1 is None:
@@ -92,13 +92,13 @@ def DFT_indices(dimensions, dtype=N.int_, dim1=None, real=False):
     
     for i in dim1:
         d = dims[i]
-        fidx = N.add.accumulate(tmp, i, )-1
+        fidx =np.add.accumulate(tmp, i, )-1
         
         if not (real and i==ndims-1):
-            fidx = N.where(fidx<=d/2, fidx, fidx-d)
+            fidx =np.where(fidx<=d/2, fidx, fidx-d)
         lst.append(fidx)
     
-    return N.array(lst)
+    returnnp.array(lst)
 
 
 def get_k2(dims, deltas=1):
@@ -113,11 +113,11 @@ def get_k2(dims, deltas=1):
     if deltas is None:
         deltas=1
     
-    freqs = 1.0/N.array(deltas)/N.array(dims)
+    freqs = 1.0/np.array(deltas)/np.array(dims)
     
     rdims = list(dims)
     rdims[-1]=rdims[-1]/2+1
-    k2 = N.zeros(shape=rdims, dtype=N.float64)
+    k2 =np.zeros(shape=rdims, dtype=np.float64)
     for i, freq in enumerate(freqs):
         ### get only a single dimension
         idx = DFT_indices(dims, dim1=[i], real=True)
@@ -128,14 +128,14 @@ def get_k2(dims, deltas=1):
 
 def test_rlzn(nr=1000, shape=(16, 256), Pk=None):
     
-    ntot = N.product(shape)
+    ntot =np.product(shape)
     
     rftshape = list(shape)
     rftshape[-1] //= 2; rftshape[-1]+=1
     rftshape=tuple(rftshape)
     
-    avg_fk = N.zeros(shape=rftshape, dtype=N.complex128)
-    avg_fk2 = N.zeros(shape=rftshape, dtype=N.float64)
+    avg_fk =np.zeros(shape=rftshape, dtype=np.complex128)
+    avg_fk2 =np.zeros(shape=rftshape, dtype=np.float64)
     
     for i in range(nr):
         fk = dft_realizn(shape, Pk=Pk)/math.sqrt(ntot)

@@ -16,7 +16,7 @@ import math
 import numbers
 
 import numpy as np
-import numpy.random as Nr
+import numpy.random as npr
 
 # from operator import isNumberType
 
@@ -63,7 +63,7 @@ def dft_realizn(dims, Pk=None, deltas=None):
     else:
         Pkn = Pk
     
-    wr = Nr.standard_normal(size=dims)  ## white noise
+    wr = npr.standard_normal(size=dims)  ## white noise
     wk = np.fft.rfftn(wr)
     
     del_k = wk

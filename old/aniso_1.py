@@ -9,8 +9,8 @@ from __future__ import division
 import math
 import copy
 
-import numpy as N
-import numpy.random as Nr
+import numpy as np
+import numpy.random as npr
 import pylab
 import scipy
 
@@ -32,17 +32,17 @@ def dft_realizn(n, Pk=None, scale=1):
     Then f(k) = sqrt[P(k)]*w(k)
     """
 
-    nn = N.array(n)
-    ntot = N.prod(nn)
+    nn =np.array(n)
+    ntot =np.prod(nn)
     
-    wr = Nr.normal(0,1,size=ntot)  ## white noise
+    wr = npr.normal(0,1,size=ntot)  ## white noise
     wr.shape = nn
-    wk = N.dft.real_fftnd(wr)      
+    wk =np.dft.real_fftnd(wr)      
 
     if Pk is None:
         return wk
     else:
-        return wk*N.sqrt(Pk(N.sqrt(get_k2(n, scale=scale))))
+        return wk*np.sqrt(Pk(np.sqrt(get_k2(n, scale=scale))))
     
 
 def excise(rlzn, n, start=0, scale=1, isFourier=False):
@@ -62,7 +62,7 @@ def getPower(rlzn):
     """
     pass
 
-def DFT_indices(dimensions, dtype=N.int_, dim1=None, real=False):
+def DFT_indices(dimensions, dtype=np.int_, dim1=None, real=False):
     """DFT_indices(dimensions,dtype=int_) returns an array representing a grid
     of DFT indices with row-only, and column-only variation.
     A DFT index is defined so that they go (0, 1, 2, .... N/2, -(N/2-1), .... -1)
@@ -78,7 +78,7 @@ def DFT_indices(dimensions, dtype=N.int_, dim1=None, real=False):
     dims = list(dimensions)
     ndims = len(dims)
     if real: dims[-1]=dims[-1]/2+1
-    tmp = N.ones(dims, dtype)
+    tmp =np.ones(dims, dtype)
     lst = []
 
     if dim1 is None:
@@ -86,13 +86,13 @@ def DFT_indices(dimensions, dtype=N.int_, dim1=None, real=False):
 
     for i in dim1:
         d = dims[i]
-        fidx = N.add.accumulate(tmp, i, )-1
+        fidx =np.add.accumulate(tmp, i, )-1
 
         if not (real and i==ndims-1):
-            fidx = N.where(fidx<=d/2, fidx, fidx-d)
+            fidx =np.where(fidx<=d/2, fidx, fidx-d)
         lst.append(fidx)
 
-    return N.array(lst)
+    returnnp.array(lst)
 
 
 def get_k2(dims, scale=None):
@@ -103,7 +103,7 @@ def get_k2(dims, scale=None):
 
     rdims = list(dims)
     rdims[-1]=rdims[-1]/2+1
-    k2 = N.zeros(shape=rdims, dtype=N.float64)
+    k2 =np.zeros(shape=rdims, dtype=np.float64)
     for i in range(len(dims)):
         idx = DFT_indices(dims, dim1=[i], real=True)   ### get only a single dimension
         if scale is None:
@@ -123,7 +123,7 @@ def driver(n=0, dims=(512,512), scale=None):
 
     if n<0:
         def Pk(k):
-            return N.where(k<=0, 0, k**n)
+            returnnp.where(k<=0, 0, k**n)
     else:
         def Pk(k):
             return k**n
@@ -132,7 +132,7 @@ def driver(n=0, dims=(512,512), scale=None):
 
     print 'delta_k: shape=', delta_k.shape
 
-    delta_r = N.dft.inverse_real_fft2d(delta_k)
+    delta_r =np.dft.inverse_real_fft2d(delta_k)
 
     print 'delta_r: shape=', delta_r.shape
 

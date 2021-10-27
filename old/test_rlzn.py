@@ -1,18 +1,18 @@
 from __future__ import division
 import aniso
-import numpy as N
+import numpy as np
 import math
 
 def test_rlzn(nr=1000, shape=(16, 256)):
     
-    ntot = N.product(shape)
+    ntot =np.product(shape)
     
     rftshape = list(shape)
     rftshape[-1] //= 2; rftshape[-1]+=1
     rftshape=tuple(rftshape)
     
-    avg_fk = N.zeros(shape=rftshape, dtype=N.complex128)
-    avg_fk2 = N.zeros(shape=rftshape, dtype=N.float64)
+    avg_fk =np.zeros(shape=rftshape, dtype=np.complex128)
+    avg_fk2 =np.zeros(shape=rftshape, dtype=np.float64)
     
     for i in range(nr):
         fk = aniso.dft_realizn(n=shape)/math.sqrt(ntot)

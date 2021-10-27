@@ -293,7 +293,7 @@ def samplingNoise():
     """
 
     
-def driver(n=0, dims=(512, 512), deltas=1, nsamples=1e6, shrink_by=2, 
+def driver(n=0, dims=(512, 512), deltas=1, nsamples=int(1e6), shrink_by=2, 
            nk=20,allplots=False, eq_vol=False, maps=True, plot_ratio=True,
            cutraw=2, title=""):
 

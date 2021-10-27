@@ -20,7 +20,7 @@ import math
 import numbers
 
 import numpy as np
-import numpy.random as Nr
+import numpy.random as npr
 
 import scipy.stats as sps
 
