@@ -116,7 +116,7 @@ def pixelSample(rlzn, nsamples=None, shrink_by=2):
     """
     
     shape_in = rlzn.shape
-    shape_out = tuple(np.int(s//shrink_by) for s in shape_in)
+    shape_out = tuple(int(s//shrink_by) for s in shape_in)
     
     print("shape_in", shape_in)
     print("shape_out", shape_out)
@@ -133,9 +133,9 @@ def pixelSample(rlzn, nsamples=None, shrink_by=2):
 
     idxs_nd = np.unravel_index(idxs_1d, shape_in)
     
-    idxs_nd_sampled = (np.array(idxs_nd, dtype=np.int)//shrink_by).transpose()
+    idxs_nd_sampled = (np.array(idxs_nd, dtype=int)//shrink_by).transpose()
     rlzn_sampled = np.zeros(shape_out)
-    n_in_pix = np.zeros(shape_out, np.int)
+    n_in_pix = np.zeros(shape_out, int)
     for i, v in zip(idxs_nd_sampled, vals):
         i = tuple(i)    ## AHJ: this (occasionally?) gives non-integer i?
         rlzn_sampled[i] += v
