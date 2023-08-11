@@ -227,8 +227,8 @@ def subsamplePower(Pk_fun, rshape, shrink_by=2, deltas=None, nk=10,
     ### therefore should really be inside the innermost loop below (see abs(ktot) check)
     nmaxs = (nmax,)*ndims  ### can be different in each direction
     rr = np.array([list(range(-nm, nm+1)) for nm in nmaxs])
-    kiter = np.array(np.meshgrid(*rr), dtype=np.float).T.reshape(-1, ndims)
-    rfac = np.array(shrink_by, dtype=np.float)*np.array(deltas, dtype=np.float)
+    kiter = np.array(np.meshgrid(*rr), dtype=np.float64).T.reshape(-1, ndims)
+    rfac = np.array(shrink_by, dtype=np.float64)*np.array(deltas, dtype=np.float64)
     kiter /= rfac   ## rescaling from raw pixels to the samples
 #     print("rfac=", rfac)
 #     print("kiter=", kiter)
